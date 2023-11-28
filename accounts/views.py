@@ -4,6 +4,7 @@ from django.contrib.auth.views import LoginView
 from django.shortcuts import HttpResponseRedirect
 from django.urls import reverse_lazy
 from django.views.generic import TemplateView, RedirectView
+from django.contrib.auth.mixins import LoginRequiredMixin
 
 from .forms import UserRegistrationForm, UserAddressForm
 
@@ -42,7 +43,7 @@ class UserRegistrationView(TemplateView):
                 )
             )
             return HttpResponseRedirect(
-                reverse_lazy('transactions:deposit_money')
+                reverse_lazy('transactions:transaction_report')
             )
 
         return self.render_to_response(
@@ -63,7 +64,9 @@ class UserRegistrationView(TemplateView):
 
 class UserLoginView(LoginView):
     template_name='accounts/user_login.html'
-    redirect_authenticated_user = True
+    
+    def get_success_url(self):
+        return reverse_lazy('transactions:transaction_report')
 
 
 class LogoutView(RedirectView):
@@ -72,4 +75,12 @@ class LogoutView(RedirectView):
     def get_redirect_url(self, *args, **kwargs):
         if self.request.user.is_authenticated:
             logout(self.request)
+        return super().get_redirect_url(*args, **kwargs)
+    
+class UserDeleteView(LoginRequiredMixin, RedirectView):
+    pattern_name = 'home'
+
+    def get_redirect_url(self, *args, **kwargs):
+        if self.request.user.is_authenticated:
+            self.request.user.delete()
         return super().get_redirect_url(*args, **kwargs)

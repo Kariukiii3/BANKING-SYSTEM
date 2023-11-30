@@ -1,6 +1,6 @@
 from django.urls import path
 
-from .views import UserRegistrationView, LogoutView, UserLoginView, UserDeleteView
+from .views import UserRegistrationView, LogoutView, UserLoginView, UserDeleteView, DownloadReportView
 
 
 app_name = 'accounts'
@@ -21,6 +21,10 @@ urlpatterns = [
     path(
         "delete/", UserDeleteView.as_view(),
         name="user_delete"
+    ),
+    path(
+        "download_report/", DownloadReportView.as_view(),
+        name="download_report"
     ),
 ]
 
